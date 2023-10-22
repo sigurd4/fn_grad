@@ -4,9 +4,27 @@
 #![feature(tuple_trait)]
 #![feature(associated_type_bounds)]
 
-moddef::moddef!{
-    flat(pub) mod {
-        fn_grad,
-        fn_der
-    }
+use core::marker::Tuple;
+
+pub trait FnGradOnce<Args>: FnOnce<Args>
+where
+    Args: Tuple
+{
+    type Gradient: FnOnce<Args>;
+
+    fn into_gradient(self) -> Self::Gradient;
+}
+
+pub trait FnGradMut<Args>: FnGradOnce<Args, Gradient: FnMut<Args>> + FnMut<Args>
+where
+    Args: Tuple
+{
+    fn as_gradient_mut(&mut self) -> &mut Self::Gradient;
+}
+
+pub trait FnGrad<Args>: FnGradMut<Args, Gradient: Fn<Args>> + Fn<Args>
+where
+    Args: Tuple
+{
+    fn as_gradient(&self) -> &Self::Gradient;
 }
