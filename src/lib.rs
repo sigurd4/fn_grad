@@ -10,9 +10,12 @@ pub trait FnGradOnce<Args>: FnOnce<Args>
 where
     Args: Tuple
 {
-    type Gradient: FnOnce<Args>;
+    type Gradient: FnOnce<Args> + ?Sized;
 
-    fn into_gradient(self) -> Self::Gradient;
+    fn into_gradient(self) -> Self::Gradient
+    where
+        Self: Sized,
+        Self::Gradient: Sized;
 }
 
 pub trait FnGradMut<Args>: FnGradOnce<Args, Gradient: FnMut<Args>> + FnMut<Args>
