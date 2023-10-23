@@ -3,9 +3,11 @@
 #![feature(unboxed_closures)]
 #![feature(tuple_trait)]
 #![feature(associated_type_bounds)]
+#![feature(const_trait_impl)]
 
 use core::marker::Tuple;
 
+#[const_trait]
 pub trait FnGradOnce<Args>: FnOnce<Args>
 where
     Args: Tuple
@@ -18,6 +20,7 @@ where
         Self::Gradient: Sized;
 }
 
+#[const_trait]
 pub trait FnGradMut<Args>: FnGradOnce<Args, Gradient: FnMut<Args>> + FnMut<Args>
 where
     Args: Tuple
@@ -25,6 +28,7 @@ where
     fn as_gradient_mut(&mut self) -> &mut Self::Gradient;
 }
 
+#[const_trait]
 pub trait FnGrad<Args>: FnGradMut<Args, Gradient: Fn<Args>> + Fn<Args>
 where
     Args: Tuple
