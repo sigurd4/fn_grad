@@ -12,26 +12,23 @@ pub trait FnGradOnce<Args>: FnOnce<Args>
 where
     Args: Tuple
 {
-    type Gradient: FnOnce<Args> + ?Sized;
+    type GradientOutput;
 
-    fn into_gradient(self) -> Self::Gradient
-    where
-        Self: Sized,
-        Self::Gradient: Sized;
+    fn gradient_once(self, args: Args) -> Self::GradientOutput;
 }
 
 #[const_trait]
-pub trait FnGradMut<Args>: FnGradOnce<Args, Gradient: FnMut<Args>> + FnMut<Args>
+pub trait FnGradMut<Args>: FnGradOnce<Args> + FnMut<Args>
 where
     Args: Tuple
 {
-    fn as_gradient_mut(&mut self) -> &mut Self::Gradient;
+    fn gradient_mut(&mut self, args: Args) -> Self::GradientOutput;
 }
 
 #[const_trait]
-pub trait FnGrad<Args>: FnGradMut<Args, Gradient: Fn<Args>> + Fn<Args>
+pub trait FnGrad<Args>: FnGradMut<Args> + Fn<Args>
 where
     Args: Tuple
 {
-    fn as_gradient(&self) -> &Self::Gradient;
+    fn gradient(&self, args: Args) -> Self::GradientOutput;
 }
